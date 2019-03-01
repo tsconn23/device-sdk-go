@@ -22,20 +22,6 @@ var (
 	pc *profileCache
 )
 
-type ProfileCache interface {
-	ForName(name string) (models.DeviceProfile, bool)
-	ForId(id string) (models.DeviceProfile, bool)
-	All() []models.DeviceProfile
-	Add(profile models.DeviceProfile) error
-	Update(profile models.DeviceProfile) error
-	Remove(id string) error
-	RemoveByName(name string) error
-	DeviceResource(profileName string, resourceName string) (models.DeviceResource, bool)
-	CommandExists(profileName string, cmd string) (bool, error)
-	ResourceOperations(profileName string, cmd string, method string) ([]models.ResourceOperation, error)
-	ResourceOperation(profileName string, object string, method string) (models.ResourceOperation, error)
-}
-
 type profileCache struct {
 	dpMap    map[string]models.DeviceProfile // key is DeviceProfile name
 	nameMap  map[string]string               // key is id, and value is DeviceProfile name
@@ -222,7 +208,7 @@ func retrieveFirstRObyObject(rosMap map[string][]models.ResourceOperation, objec
 	return models.ResourceOperation{}, false
 }
 
-func newProfileCache(profiles []models.DeviceProfile) ProfileCache {
+func NewProfileCache(profiles []models.DeviceProfile) *profileCache {
 	defaultSize := len(profiles) * 2
 	dpMap := make(map[string]models.DeviceProfile, defaultSize)
 	nameMap := make(map[string]string, defaultSize)
@@ -241,7 +227,7 @@ func newProfileCache(profiles []models.DeviceProfile) ProfileCache {
 	return pc
 }
 
-func Profiles() ProfileCache {
+func Profiles() *profileCache {
 	if pc == nil {
 		InitCache()
 	}

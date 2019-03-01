@@ -103,7 +103,7 @@ func (s *Service) Start(errChan chan error) (err error) {
 	// initialize driver
 	if common.CurrentConfig.Service.EnableAsyncReadings {
 		s.asyncCh = make(chan *ds_models.AsyncValues, common.CurrentConfig.Service.AsyncBufferSize)
-		go processAsyncResults()
+		go processAsyncResults(cache.Devices(), cache.Profiles())
 	}
 	err = common.Driver.Initialize(common.LoggingClient, s.asyncCh)
 	if err != nil {

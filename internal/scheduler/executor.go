@@ -8,6 +8,7 @@ package scheduler
 
 import (
 	"fmt"
+	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"path"
 	"regexp"
 	"strconv"
@@ -61,7 +62,9 @@ func execCmd(se *schEvtExec) {
 	vars := make(map[string]string, 2)
 	vars[nameVar] = deviceName
 	vars[commandVar] = cmdName
-	evt, appErr := handler.CommandHandler(vars, se.schEvt.Parameters, addr.HTTPMethod)
+
+	cmd := handler.NewCommand(cache.Devices(), cache.Profiles())
+	evt, appErr := cmd.Handle(vars, se.schEvt.Parameters, addr.HTTPMethod)
 	if appErr != nil {
 		common.LoggingClient.Error(fmt.Sprintf("Schecule Event %s execution failed, AppErr: %v", se.schEvt.Name, appErr))
 		return

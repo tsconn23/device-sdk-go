@@ -10,6 +10,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -91,7 +92,8 @@ func commandFunc(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	event, appErr := handler.CommandHandler(vars, body, req.Method)
+	cmd := handler.NewCommand(cache.Devices(), cache.Profiles())
+	event, appErr := cmd.Handle(vars, body, req.Method)
 
 	if appErr != nil {
 		http.Error(w, fmt.Sprintf("%s %s", appErr.Message(), req.URL.Path), appErr.Code())
@@ -114,7 +116,9 @@ func commandAllFunc(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	events, appErr := handler.CommandAllHandler(vars["command"], body, req.Method)
+	cmd := handler.NewCommand(cache.Devices(), cache.Profiles())
+	events, appErr := cmd.HandleAll(vars["command"], body, req.Method)
+
 	if appErr != nil {
 		http.Error(w, appErr.Message(), appErr.Code())
 	} else if len(events) > 0 {

@@ -43,7 +43,7 @@ func InitCache() {
 		for i, d := range ds {
 			dps[i] = d.Profile
 		}
-		newProfileCache(dps)
+		NewProfileCache(dps)
 
 		ses, err := common.ScheduleEventClient.ScheduleEventsForServiceByName(common.ServiceName, ctx)
 		if err != nil {

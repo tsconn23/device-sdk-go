@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/transformer"
 	ds_models "github.com/edgexfoundry/device-sdk-go/pkg/models"
@@ -22,12 +21,12 @@ import (
 // processAsyncResults processes readings that are pushed from
 // a DS implementation. Each is reading is optionally transformed
 // before being pushed to Core Data.
-func processAsyncResults() {
+func processAsyncResults(devices DeviceCache, profiles ProfileCache) {
 	for !svc.stopped {
 		acv := <-svc.asyncCh
 		readings := make([]models.Reading, 0, len(acv.CommandValues))
 
-		device, ok := cache.Devices().ForName(acv.DeviceName)
+		device, ok := devices.ForName(acv.DeviceName)
 		if !ok {
 			common.LoggingClient.Error(fmt.Sprintf("processAsyncResults - recieved Device %s not found in cache", acv.DeviceName))
 			continue
@@ -35,7 +34,7 @@ func processAsyncResults() {
 
 		for _, cv := range acv.CommandValues {
 			// get the device resource associated with the rsp.RO
-			dr, ok := cache.Profiles().DeviceResource(device.Profile.Name, cv.RO.Object)
+			dr, ok := profiles.DeviceResource(device.Profile.Name, cv.RO.Object)
 			if !ok {
 				common.LoggingClient.Error(fmt.Sprintf("processAsyncResults - Device Resource %s not found in Device %s", cv.RO.Object, acv.DeviceName))
 				continue

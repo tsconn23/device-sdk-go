@@ -17,18 +17,6 @@ var (
 	dc *deviceCache
 )
 
-type DeviceCache interface {
-	ForName(name string) (models.Device, bool)
-	ForId(id string) (models.Device, bool)
-	All() []models.Device
-	Add(device models.Device) error
-	Update(device models.Device) error
-	UpdateAddressable(addressable models.Addressable) error
-	Remove(id string) error
-	RemoveByName(name string) error
-	UpdateAdminState(id string, state models.AdminState) error
-}
-
 type deviceCache struct {
 	dMap    map[string]*models.Device // key is Device name
 	nameMap map[string]string         // key is id, and value is Device name
@@ -140,7 +128,7 @@ func (d *deviceCache) UpdateAdminState(id string, state models.AdminState) error
 	return nil
 }
 
-func newDeviceCache(devices []models.Device) DeviceCache {
+func newDeviceCache(devices []models.Device) *deviceCache {
 	defaultSize := len(devices) * 2
 	dMap := make(map[string]*models.Device, defaultSize)
 	nameMap := make(map[string]string, defaultSize)
@@ -152,7 +140,7 @@ func newDeviceCache(devices []models.Device) DeviceCache {
 	return dc
 }
 
-func Devices() DeviceCache {
+func Devices() *deviceCache {
 	if dc == nil {
 		InitCache()
 	}
